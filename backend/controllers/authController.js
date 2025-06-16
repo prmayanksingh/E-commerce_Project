@@ -1,8 +1,14 @@
 const User = require("../models/User");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
+
+    if (!name || !email || !password || !role) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -22,7 +28,10 @@ const registerUser = async (req, res) => {
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    return res.status(400).json({ message: "User alredy exists" });
+    console.error("Error during registration:", error);
+    return res
+      .status(500)
+      .json({ message: "Server error during registration" });
   }
 };
 
@@ -48,17 +57,16 @@ const loginUser = async (req, res) => {
       }
     );
 
-    res.status(200),
-      json({
-        message: "Login successful",
-        token,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
-      });
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error during login" });
   }
