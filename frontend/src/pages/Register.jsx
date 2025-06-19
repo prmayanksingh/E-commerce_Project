@@ -1,13 +1,39 @@
+import axios from "axios";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const register = () => {
-    const {register, handleSubmit, reset, formState: { errors }} = useForm();
-    const submitHandler = (data)=>{
-        if(data.password !== data.confirmPassword) alert("password didnot match")
-        else alert("password matched")
+const Register = () => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
+
+  const navigate = useNavigate();
+
+  const submitHandler = async (data) => {
+    if (data.password !== data.confirmPassword) {
+      alert("Passwords do not match");
+      return;
     }
-    
+
+    try {
+      const res = await axios.post("http://localhost:5000/api/register", {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        role: data.role, // <-- send role
+      });
+
+      alert("Registration successful");
+      reset();
+      navigate("/");
+    } catch (err) {
+      alert(err.response?.data?.message || "Something went wrong");
+    }
+  };
+
   return (
     <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-4">
       <div className="bg-gray-800 bg-opacity-90 backdrop-blur-md p-8 rounded-2xl shadow-lg w-full max-w-md">
@@ -21,41 +47,89 @@ const register = () => {
               Full Name
             </label>
             <input
-              {...register("name")}
+              {...register("name", { required: "Name is required" })}
               type="text"
               placeholder="Enter Your Name"
               className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {errors.name && (
+              <p className="text-sm text-red-400">{errors.name.message}</p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm text-gray-300 mb-1">Email</label>
             <input
-              {...register("email")}
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: "Enter a valid email",
+                },
+              })}
               type="email"
               placeholder="Enter Your Email"
               className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {errors.email && (
+              <p className="text-sm text-red-400">{errors.email.message}</p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm text-gray-300 mb-1">Password</label>
             <input
-              {...register("password")}
+              {...register("password", {
+                required: "Password is required",
+                minLength: {
+                  value: 6,
+                  message: "Password must be at least 6 characters",
+                },
+              })}
               type="password"
               placeholder="Create a secure password"
               className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {errors.password && (
+              <p className="text-sm text-red-400">{errors.password.message}</p>
+            )}
           </div>
 
-           <div>
-            <label className="block text-sm text-gray-300 mb-1">Confirm Password</label>
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">
+              Confirm Password
+            </label>
             <input
-              {...register("confirmPassword")}
+              {...register("confirmPassword", {
+                required: "Please confirm your password",
+              })}
               type="password"
               placeholder="Re-enter the password"
               className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {errors.confirmPassword && (
+              <p className="text-sm text-red-400">
+                {errors.confirmPassword.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">Role</label>
+            <select
+              {...register("role", { required: "Role is required" })}
+              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              defaultValue=""
+            >
+              <option value="" disabled>
+                Select Role
+              </option>
+              <option value="user">Buyer</option>
+              <option value="seller">Seller</option>
+            </select>
+            {errors.role && (
+              <p className="text-sm text-red-400">{errors.role.message}</p>
+            )}
           </div>
 
           <button
@@ -67,9 +141,9 @@ const register = () => {
         </form>
 
         <p className="mt-5 text-center text-sm text-gray-400">
-          Already have an account?
+          Already have an account?{" "}
           <Link to={"/"} className="text-blue-400 hover:underline">
-          Login
+            Login
           </Link>
         </p>
       </div>
@@ -77,4 +151,4 @@ const register = () => {
   );
 };
 
-export default register;
+export default Register;

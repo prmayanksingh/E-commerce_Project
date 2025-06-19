@@ -2,13 +2,18 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const registerUser = async (req, res) => {
+const registerController = async (req, res) => {
   try {
+    console.log("Register request body:", req.body);
+
     const { name, email, password, role } = req.body;
 
-    if (!name || !email || !password || !role) {
+    if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
+
+    // Set a default role if not provided
+    const userRole = role || "user";
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -21,21 +26,21 @@ const registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role,
+      role: userRole,
     });
 
     await user.save();
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    console.error("Error during registration:", error);
+    console.error("Error during registration:", error.stack || error);
     return res
       .status(500)
       .json({ message: "Server error during registration" });
   }
 };
 
-const loginUser = async (req, res) => {
+const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -72,4 +77,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+module.exports = {
+  registerController,
+  loginController,
+};
