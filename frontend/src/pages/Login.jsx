@@ -18,7 +18,12 @@ const Login = () => {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      navigate("/dashbord");
+      // Redirect based on user role
+      if (res.data.user.role === "seller") {
+        navigate("/dashboard");
+      } else {
+        navigate("/products");
+      }
     } catch (error) {
       console.error(error.response?.data?.message);
       alert(error.response?.data?.message || "Login Failed");

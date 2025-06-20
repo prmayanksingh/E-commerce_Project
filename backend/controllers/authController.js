@@ -54,6 +54,11 @@ const loginController = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET is not defined in environment variables");
+      return res.status(500).json({ message: "JWT secret not configured on server" });
+    }
+
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
@@ -73,6 +78,7 @@ const loginController = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Error during login:", error.stack || error);
     res.status(500).json({ message: "Server error during login" });
   }
 };
