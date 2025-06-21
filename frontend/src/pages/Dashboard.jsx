@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import SellerProductManager from "../pages/SellerProductManager";
 
 const Dashboard = () => {
   return (
-    <div>Dashboard</div>
-  )
-}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100">
+      <SellerProductManager />
+    </div>
+  );
+};
 
-export default Dashboard
+export default Dashboard;
