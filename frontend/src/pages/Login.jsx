@@ -1,6 +1,9 @@
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../utils/api";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useEffect } from "react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,8 +18,7 @@ const Login = () => {
       const res = await API.post("/login", data);
       console.log("Login Successfully", res.data);
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      sessionStorage.setItem("token", res.data.token);
 
       // Redirect based on user role
       if (res.data.user.role === "seller") {
@@ -25,13 +27,13 @@ const Login = () => {
         navigate("/products");
       }
     } catch (error) {
-      console.error(error.response?.data?.message);
-      alert(error.response?.data?.message || "Login Failed");
+      toast.error(error.response?.data?.message || "Login Failed");
     }
   };
 
   return (
     <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-4">
+      <ToastContainer />
       <div className="bg-gray-800 bg-opacity-90 backdrop-blur-md p-8 rounded-2xl shadow-lg w-full max-w-md">
         <h2 className="text-3xl font-semibold text-center text-white mb-6">
           Welcome Back 👋

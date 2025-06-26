@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const initialForm = {
   name: "",
@@ -6,7 +10,7 @@ const initialForm = {
   price: "",
   stock: "",
   category: "",
-  imageUrl: "",
+  imageURL: "",
 };
 
 const SellerProductManager = () => {
@@ -14,93 +18,99 @@ const SellerProductManager = () => {
   const [form, setForm] = useState(initialForm);
   const [editingIndex, setEditingIndex] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [seller, setSeller] = useState({ name: "Unknown", email: "" });
+  const navigate = useNavigate();
 
-  // Get seller info from localStorage
+  const handleLogout = () => {
+    sessionStorage.removeItem("token");
+    navigate("/");
+  };
+
+  // Load products from API on mount
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      try {
-        const parsed = JSON.parse(user);
-        setSeller({ name: parsed.name, email: parsed.email });
-      } catch {}
-    }
+    fetchProducts();
   }, []);
 
-  // Load products from localStorage on mount, filter by seller
-  useEffect(() => {
-    const saved = localStorage.getItem("seller_products");
-    if (saved) {
-      const allProducts = JSON.parse(saved);
-      setProducts(
-        allProducts.filter(
-          (p) => p.sellerEmail === seller.email
-        )
-      );
-    }
-  }, [seller.email]);
-
-  // Save products to localStorage whenever they change (merge with others)
-  useEffect(() => {
-    const saved = localStorage.getItem("seller_products");
-    let allProducts = [];
-    if (saved) allProducts = JSON.parse(saved);
-    // Remove old products from this seller
-    const filtered = allProducts.filter((p) => p.sellerEmail !== seller.email);
-    // Add current seller's products
-    localStorage.setItem(
-      "seller_products",
-      JSON.stringify([...filtered, ...products])
-    );
-  }, [products, seller.email]);
+  const fetchProducts = () => {
+    const token = sessionStorage.getItem("token");
+    if (!token) return;
+    axios
+      .get("http://localhost:5000/api/products/my", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setProducts(res.data))
+      .catch(() => setProducts([]));
+  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const sellerName = seller.name;
-    const sellerEmail = seller.email;
-    if (editingIndex !== null) {
-      // Edit product
-      const updated = [...products];
-      updated[editingIndex] = { ...form, sellerName, sellerEmail };
-      setProducts(updated);
-      setEditingIndex(null);
-    } else {
-      // Add product
-      setProducts([...products, { ...form, sellerName, sellerEmail }]);
+    const token = sessionStorage.getItem("token");
+    if (!token) return;
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/products",
+        {
+          ...form,
+          price: Number(form.price),
+          stock: Number(form.stock),
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setProducts([...products, res.data.product]);
+      setForm(initialForm);
+      setShowForm(false);
+      toast.success("Product added successfully");
+    } catch (err) {
+      toast.error("Failed to add product");
     }
-    setForm(initialForm);
-    setShowForm(false);
   };
 
   const handleEdit = (idx) => {
-    setForm(products[idx]);
-    setEditingIndex(idx);
-    setShowForm(true);
+    const productId = products[idx]._id;
+    navigate(`/edit-product/${productId}`);
   };
 
-  const handleDelete = (idx) => {
-    setProducts(products.filter((_, i) => i !== idx));
+  // Remove product from DB and refresh list
+  const handleDelete = async (idx) => {
+    const token = sessionStorage.getItem("token");
+    if (!token) return;
+    const productId = products[idx]._id;
+    try {
+      await axios.delete(`http://localhost:5000/api/products/${productId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchProducts();
+      toast.success("Product deleted successfully");
+    } catch (err) {
+      toast.error("Failed to delete product");
+    }
   };
 
   return (
     <div className="max-w-5xl mx-auto p-4 min-h-screen bg-gradient-to-br from-blue-50 to-purple-100">
+      <ToastContainer />
       <div className="mx-auto p-4 max-w-5xl">
-        <h2 className="text-3xl font-extrabold mb-8 text-center text-blue-800 tracking-tight drop-shadow">
-          Seller Product Management
-        </h2>
-        <div className="mb-2 text-right text-blue-700 font-semibold">
-          Seller: {seller.name}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-extrabold text-blue-800 tracking-tight drop-shadow">
+            Seller Product Management
+          </h2>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold shadow"
+          >
+            Logout
+          </button>
         </div>
         <div className="flex justify-end mb-6">
           <button
             className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform font-semibold"
             onClick={() => {
               setForm(initialForm);
-              setEditingIndex(null);
               setShowForm(true);
             }}
           >
@@ -187,8 +197,8 @@ const SellerProductManager = () => {
               </label>
               <input
                 type="url"
-                name="imageUrl"
-                value={form.imageUrl}
+                name="imageURL"
+                value={form.imageURL}
                 onChange={handleChange}
                 className="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400"
                 required
@@ -201,7 +211,6 @@ const SellerProductManager = () => {
                 onClick={() => {
                   setShowForm(false);
                   setForm(initialForm);
-                  setEditingIndex(null);
                 }}
               >
                 Cancel
@@ -225,14 +234,13 @@ const SellerProductManager = () => {
                 <th className="py-3 px-4 text-blue-700">Price</th>
                 <th className="py-3 px-4 text-blue-700">Stock</th>
                 <th className="py-3 px-4 text-blue-700">Category</th>
-                <th className="py-3 px-4 text-blue-700">Seller</th>
                 <th className="py-3 px-4 text-blue-700">Actions</th>
               </tr>
             </thead>
             <tbody>
               {products.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="text-center py-6 text-gray-400">
+                  <td colSpan="7" className="text-center py-6 text-gray-400">
                     No products added yet.
                   </td>
                 </tr>
@@ -241,7 +249,7 @@ const SellerProductManager = () => {
                   <tr key={idx} className="hover:bg-blue-50 transition-colors">
                     <td className="py-2 px-4">
                       <img
-                        src={product.imageUrl}
+                        src={product.imageURL}
                         alt={product.name}
                         className="w-16 h-16 object-cover rounded-lg border border-blue-100 shadow"
                       />
@@ -257,7 +265,6 @@ const SellerProductManager = () => {
                     </td>
                     <td className="py-2 px-4">{product.stock}</td>
                     <td className="py-2 px-4">{product.category}</td>
-                    <td className="py-2 px-4">{product.sellerName}</td>
                     <td className="py-2 px-4 flex gap-2">
                       <button
                         className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded-lg font-semibold shadow"

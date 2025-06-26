@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Register = () => {
   const {
@@ -14,7 +16,7 @@ const Register = () => {
 
   const submitHandler = async (data) => {
     if (data.password !== data.confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
@@ -23,19 +25,22 @@ const Register = () => {
         name: data.name,
         email: data.email,
         password: data.password,
-        role: data.role, // <-- send role
+        role: data.role,
       });
 
-      alert("Registration successful");
+      toast.success("Registration successful");
       reset();
-      navigate("/");
+      setTimeout(() => {
+        navigate("/");
+      }, 1000); // Show toast for 1.2s before navigating
     } catch (err) {
-      alert(err.response?.data?.message || "Something went wrong");
+      toast.error(err.response?.data?.message || "Something went wrong");
     }
   };
 
   return (
     <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-4">
+      <ToastContainer />
       <div className="bg-gray-800 bg-opacity-90 backdrop-blur-md p-8 rounded-2xl shadow-lg w-full max-w-md">
         <h2 className="text-3xl font-semibold text-center text-white mb-6">
           Create Your Account ✨

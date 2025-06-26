@@ -1,11 +1,11 @@
-import MainRoute from "./routes/MainRoute"
+import MainRoute from "./routes/MainRoute";
 
 const App = () => {
   return (
-    <div>
-      <MainRoute/>
+    <div className="bg-[#F0EFFE]">
+      <MainRoute />
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
