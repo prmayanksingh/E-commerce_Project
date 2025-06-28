@@ -33,7 +33,6 @@ const Login = () => {
 
   return (
     <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-4">
-      <ToastContainer />
       <div className="bg-gray-800 bg-opacity-90 backdrop-blur-md p-8 rounded-2xl shadow-lg w-full max-w-md">
         <h2 className="text-3xl font-semibold text-center text-white mb-6">
           Welcome Back 👋

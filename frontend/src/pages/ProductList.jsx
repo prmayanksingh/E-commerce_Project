@@ -26,20 +26,23 @@ const ProductList = () => {
     products.some((p) => p.name && p.price && p.stock);
 
   return (
-    <div className="w-full min-h-screen bg-pink-100 p-4">
-      <div className="max-w-5xl mx-auto">
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white p-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-extrabold text-blue-800 tracking-tight drop-shadow">
-            Products
+          <h2 className="text-4xl archivo-black-regular bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent drop-shadow-md tracking-wide">
+            All Products
           </h2>
           <button
             onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold shadow"
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md font-medium shadow"
           >
             Logout
           </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        {/* Product Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {loading ? (
             <div className="col-span-full text-center text-gray-400 text-lg">
               Loading...
@@ -53,29 +56,32 @@ const ProductList = () => {
               product.name && product.price && product.stock ? (
                 <div
                   key={idx}
-                  className="bg-white rounded-xl shadow-md p-4 border border-blue-100 flex flex-col items-center transform transition-all duration-200 hover:scale-105 hover:-translate-y-1 hover:shadow-pink-200 hover:shadow-lg hover:border-pink-300"
+                  className="bg-[#1e293b] bg-opacity-90 backdrop-blur-md rounded-xl overflow-hidden shadow-lg transition-all hover:scale-[1.02] hover:shadow-pink-300/30 border border-white/10 flex flex-col"
                 >
-                  <img
-                    src={product.imageURL}
-                    alt={product.name}
-                    className="w-32 h-32 object-cover rounded mb-4"
-                  />
-                  <h3 className="text-xl font-bold text-blue-700 mb-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-gray-600 mb-2">{product.description}</p>
-                  <p className="text-green-700 font-bold mb-2">
-                    ₹{product.price}
-                  </p>
-                  <p className="text-sm text-gray-500 mb-2">
-                    Stock: {product.stock}
-                  </p>
-                  <p className="text-sm text-purple-500 mb-1">
-                    Category: {product.category}
-                  </p>
-                  <p className="text-xs text-gray-400 italic">
-                    Seller: {product.sellerId?.name || "Unknown"}
-                  </p>
+                  {/* Image Section */}
+                  <div className="h-64 sm:h-72 bg-white flex items-center justify-center overflow-hidden">
+                    <img
+                      src={product.imageURL}
+                      alt={product.name}
+                      className="object-contain w-full h-full"
+                    />
+                  </div>
+
+                  {/* Details */}
+                  <div className="p-4 flex flex-col gap-1">
+                    <h3 className="text-xl font-bold text-white">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-gray-300">
+                      ₹{product.price} • Stock: {product.stock}
+                    </p>
+                    <p className="text-sm text-pink-400 font-medium">
+                      {product.category}
+                    </p>
+                    <p className="text-xs text-gray-400 italic mt-2">
+                      Seller: {product.sellerId?.name || "Unknown"}
+                    </p>
+                  </div>
                 </div>
               ) : null
             )
