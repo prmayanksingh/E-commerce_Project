@@ -1,17 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-
-const initialForm = {
-  name: "",
-  description: "",
-  price: "",
-  stock: "",
-  category: "",
-  imageURL: "",
-};
 
 const categories = [
   "Electronics",
@@ -31,45 +22,21 @@ const categories = [
   "Pet Supplies",
 ];
 
-const EditProduct = () => {
-  const { id } = useParams();
+const AddProduct = () => {
   const navigate = useNavigate();
   const {
     register,
     handleSubmit,
-    setValue,
     reset,
     formState: { errors },
   } = useForm();
-
-  useEffect(() => {
-    const token = sessionStorage.getItem("token");
-    if (!token) return;
-    axios
-      .get(`http://localhost:5000/api/products/my`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        const product = res.data.find((p) => p._id === id);
-        if (product) {
-          reset({
-            name: product.name || "",
-            description: product.description || "",
-            price: product.price || "",
-            stock: product.stock || "",
-            category: product.category || "",
-            imageURL: product.imageURL || "",
-          });
-        }
-      });
-  }, [id, reset]);
 
   const onSubmit = async (data) => {
     const token = sessionStorage.getItem("token");
     if (!token) return;
     try {
-      await axios.put(
-        `http://localhost:5000/api/products/${id}`,
+      await axios.post(
+        "http://localhost:5000/api/products",
         {
           ...data,
           price: Number(data.price),
@@ -79,10 +46,11 @@ const EditProduct = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      toast.success("Product updated successfully");
-      navigate("/dashboard"); // navigate instantly, no delay
+      toast.success("Product added successfully");
+      reset();
+      navigate("/dashboard");
     } catch (err) {
-      toast.error("Failed to update product");
+      toast.error(err.response?.data?.message || "Failed to add product");
     }
   };
 
@@ -90,7 +58,7 @@ const EditProduct = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       <div className="backdrop-blur-md bg-gray-800 bg-opacity-90 rounded-lg shadow-lg p-8 w-full max-w-lg">
         <h2 className="text-2xl font-bold text-center text-white mb-6">
-          Edit Product
+          Add Product
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <input
@@ -181,7 +149,7 @@ const EditProduct = () => {
               type="submit"
               className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold"
             >
-              Update Product
+              Add Product
             </button>
           </div>
         </form>
@@ -190,4 +158,4 @@ const EditProduct = () => {
   );
 };
 
-export default EditProduct;
+export default AddProduct;
