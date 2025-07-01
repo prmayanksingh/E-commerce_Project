@@ -1,9 +1,8 @@
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../utils/api";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useEffect } from "react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,11 +19,10 @@ const Login = () => {
 
       sessionStorage.setItem("token", res.data.token);
 
-      // Redirect based on user role
       if (res.data.user.role === "seller") {
         navigate("/dashboard");
       } else {
-        navigate("/products");
+        navigate("/browse");
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Login Failed");
@@ -44,7 +42,7 @@ const Login = () => {
             <input
               {...register("email", { required: "Email is required" })}
               type="email"
-              placeholder="Enter you email"
+              placeholder="Enter your email"
               className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.email && (
@@ -74,7 +72,7 @@ const Login = () => {
         </form>
 
         <p className="mt-5 text-center text-sm text-gray-400">
-          Don’t have an account?
+          Don’t have an account?{" "}
           <Link to={"/register"} className="text-blue-400 hover:underline">
             Register
           </Link>

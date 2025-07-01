@@ -23,7 +23,7 @@ const ProductList = () => {
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
       <ProductNavBar />
-      <div className="max-w-6xl mx-auto px-6 pt-10 pb-16">
+      <div className="w-full mx-auto lg:px-30 pt-10 pb-16">
         <div className="flex flex-wrap justify-center gap-6">
           {loading ? (
             <div className="col-span-full text-center text-gray-400 text-lg">
