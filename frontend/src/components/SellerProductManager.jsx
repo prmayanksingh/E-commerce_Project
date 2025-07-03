@@ -5,9 +5,11 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SellerNavBar from "./SellerNavBar";
 import SellerProductCard from "./SellerProductCard";
+import SearchBar from "./SearchBar";
 
 const SellerProductManager = () => {
   const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,13 +47,18 @@ const SellerProductManager = () => {
     }
   };
 
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-      <SellerNavBar/>
+      <SellerNavBar />
       <div className="max-w-6xl mx-auto px-6 pt-10 pb-16">
-        {/* CARDS */}
+        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+
         <div className="flex flex-wrap justify-center gap-6">
-          {products.map((product, idx) => (
+          {filteredProducts.map((product, idx) => (
             <SellerProductCard
               key={product._id || idx}
               product={product}

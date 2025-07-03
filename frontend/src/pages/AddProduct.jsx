@@ -56,7 +56,7 @@ const AddProduct = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      <div className="backdrop-blur-md bg-gray-800 bg-opacity-90 rounded-lg shadow-lg p-8 w-full max-w-lg">
+      <div className="backdrop-blur-md bg-gray-800 bg-opacity-90 rounded-lg shadow-lg p-8 w-full max-w-lg mx-4">
         <h2 className="text-2xl font-bold text-center text-white mb-6">
           Add Product
         </h2>
