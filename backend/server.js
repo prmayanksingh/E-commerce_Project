@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
+const cartRoutes = require("./routes/cartRoutes");
 const cors = require("cors");
 
 // Load environment variables from .env
@@ -24,6 +25,7 @@ app.use(express.json());
 
 app.use("/api", authRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/cart", cartRoutes);
 
 
 // Test route

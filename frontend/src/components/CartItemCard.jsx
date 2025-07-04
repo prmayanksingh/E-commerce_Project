@@ -1,15 +1,20 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 
-const ProductCard = ({ product, onCardClick }) => {
+const CartItemCard = ({ product }) => {
   const navigate = useNavigate();
+  const { removeFromCart } = useCart();
+
+  const handleRemove = (e) => {
+    e.stopPropagation(); // Prevent navigation when clicking remove
+    removeFromCart(product._id);
+  };
 
   return (
     <div
-      onClick={() =>
-        onCardClick ? onCardClick(product) : navigate(`/product/${product._id}`)
-      }
-      className="cursor-pointer hover:scale-105 transition duration-300 bg-[#1e293b] bg-opacity-90 backdrop-blur-md rounded-xl overflow-hidden shadow-md border border-white/10 mb-4"
+      onClick={() => navigate(`/product/${product._id}`)}
+      className="cursor-pointer hover:scale-105 transition duration-300 bg-[#1e293b] bg-opacity-90 backdrop-blur-md rounded-xl overflow-hidden shadow-md border border-white/10 mb-4 relative"
       style={{ width: "280px" }}
     >
       <div className="h-60">
@@ -32,9 +37,15 @@ const ProductCard = ({ product, onCardClick }) => {
         <p className="text-xs text-gray-400 italic mt-2">
           Seller: {product.sellerId?.name || "Unknown"}
         </p>
+        <button
+          onClick={handleRemove}
+          className="mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm transition-colors"
+        >
+          Remove from Cart
+        </button>
       </div>
     </div>
   );
 };
 
-export default ProductCard;
+export default CartItemCard; 

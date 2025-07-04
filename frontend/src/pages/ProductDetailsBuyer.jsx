@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ProductNavBar from "../components/ProductNavBar";
+import { useCart } from "../context/CartContext";
+import { toast } from "react-toastify";
 
 const ProductDetailsBuyer = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
+  const { addToCart, removeFromCart, isInCart } = useCart();
 
   useEffect(() => {
     axios
@@ -25,6 +28,16 @@ const ProductDetailsBuyer = () => {
       </div>
     );
   }
+
+  const inCart = isInCart(product._id);
+
+  const handleCartClick = () => {
+    if (inCart) {
+      removeFromCart(product._id);
+    } else {
+      addToCart(product);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
@@ -93,8 +106,15 @@ const ProductDetailsBuyer = () => {
             )}
 
             <div className="flex gap-4 mt-6">
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md">
-                Add to Cart 🛒
+              <button
+                className={`${
+                  inCart
+                    ? "bg-red-600 hover:bg-red-700"
+                    : "bg-blue-600 hover:bg-blue-700"
+                } text-white px-6 py-2 rounded-md`}
+                onClick={handleCartClick}
+              >
+                {inCart ? "Remove from Cart" : "Add to Cart"} 🛒
               </button>
               <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md">
                 Buy Now

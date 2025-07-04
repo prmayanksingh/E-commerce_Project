@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import ProductNavBar from "../components/ProductNavBar";
 import ProductCard from "../components/ProductCard";
 import SearchBar from "../components/SearchBar";
@@ -11,6 +12,8 @@ const ProductList = () => {
 
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedPriceRange, setSelectedPriceRange] = useState("all");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -102,7 +105,11 @@ const ProductList = () => {
             <div className="text-center text-gray-400 text-lg">No matching products.</div>
           ) : (
             filteredProducts.map((product, idx) => (
-              <ProductCard key={product._id || idx} product={product} />
+              <ProductCard
+                key={product._id || idx}
+                product={product}
+                onCardClick={() => navigate(`/product/${product._id}`)}
+              />
             ))
           )}
         </div>

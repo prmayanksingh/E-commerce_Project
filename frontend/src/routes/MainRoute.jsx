@@ -8,6 +8,7 @@ import EditProduct from "../pages/EditProduct";
 import BrowseLanding from "../pages/BrowseLanding";
 import ProductDetailsBuyer from "../pages/ProductDetailsBuyer";
 import ProductDetailsSeller from "../pages/ProductDetailsSeller";
+import CartPage from "../pages/CartPage";
 
 const MainRoute = () => {
   return (
@@ -22,6 +23,7 @@ const MainRoute = () => {
       <Route path="/product/:id" element={<ProductDetailsBuyer />} />
       <Route path="/browse" element={<BrowseLanding />} />
       <Route path="/products" element={<ProductList />} />
+      <Route path="/cart" element={<CartPage />} />
     </Routes>
   );
 };

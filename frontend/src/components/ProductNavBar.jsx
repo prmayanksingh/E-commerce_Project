@@ -1,8 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 
 const ProductNavBar = () => {
   const navigate = useNavigate();
+  const { cart } = useCart();
 
   const handleLogout = () => {
     sessionStorage.removeItem("token");
@@ -15,12 +17,28 @@ const ProductNavBar = () => {
         <h2 className="text-4xl archivo-black-regular bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent drop-shadow-md tracking-wide">
           CART HIVE
         </h2>
-        <button
-          onClick={handleLogout}
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-md font-medium shadow"
-        >
-          Logout
-        </button>
+        <div className="flex gap-3 items-center">
+          <button
+            onClick={() => navigate("/cart")}
+            className="relative bg-gray-800 hover:bg-gray-700 text-white px-4 py-1.5 rounded-md font-medium shadow flex items-center"
+          >
+            <span role="img" aria-label="cart" className="mr-2">
+              🛒
+            </span>
+            Cart
+            {cart.length > 0 && (
+              <span className="ml-2 bg-pink-500 text-white rounded-full px-2 py-0.5 text-xs">
+                {cart.length}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-md font-medium shadow"
+          >
+            Logout
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -23,6 +23,12 @@ const Login = () => {
         navigate("/dashboard");
       } else {
         navigate("/browse");
+        // Dispatch custom event after navigation for buyers
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent("userLogin", { 
+            detail: { role: res.data.user.role } 
+          }));
+        }, 100);
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Login Failed");
