@@ -5,25 +5,22 @@ import ProductList from "../pages/ProductList";
 import SellerProductManager from "../components/SellerProductManager";
 import AddProduct from "../pages/AddProduct";
 import EditProduct from "../pages/EditProduct";
-import BrowseLanding from "../pages/BrowseLanding"; // ✅ NEW COMPONENT
+import BrowseLanding from "../pages/BrowseLanding";
+import ProductDetailsBuyer from "../pages/ProductDetailsBuyer";
+import ProductDetailsSeller from "../pages/ProductDetailsSeller";
 
 const MainRoute = () => {
   return (
     <Routes>
-      {/* Default route */}
       <Route path="/" element={<Navigate to="/login" />} />
-
-      {/* Authentication */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-
-      {/* Seller routes */}
       <Route path="/dashboard" element={<SellerProductManager />} />
       <Route path="/add-product" element={<AddProduct />} />
       <Route path="/edit-product/:id" element={<EditProduct />} />
-
-      {/* Buyer routes */}
-      <Route path="/browse" element={<BrowseLanding />} /> {/* 👈 Landing page for buyers */}
+      <Route path="/seller/product/:id" element={<ProductDetailsSeller />} />
+      <Route path="/product/:id" element={<ProductDetailsBuyer />} />
+      <Route path="/browse" element={<BrowseLanding />} />
       <Route path="/products" element={<ProductList />} />
     </Routes>
   );

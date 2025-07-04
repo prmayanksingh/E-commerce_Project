@@ -43,7 +43,7 @@ const ProductList = () => {
     <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
       <ProductNavBar />
 
-      <div className="max-w-6xl mx-auto px-6 pt-10 pb-16">
+      <div className="w-full mx-auto px-6 pt-10 pb-16">
         {/* Search and Filters */}
         <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-center gap-8 mb-10">
           <div className="flex-1 max-w-md">

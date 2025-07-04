@@ -30,26 +30,6 @@ const SellerProductManager = () => {
       .catch(() => setProducts([]));
   };
 
-  const handleEdit = (idx) => {
-    const productId = products[idx]._id;
-    navigate(`/edit-product/${productId}`);
-  };
-
-  const handleDelete = async (idx) => {
-    const token = sessionStorage.getItem("token");
-    if (!token) return;
-    const productId = products[idx]._id;
-    try {
-      await axios.delete(`http://localhost:5000/api/products/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchProducts();
-      toast.success("Product deleted successfully");
-    } catch (err) {
-      toast.error("Failed to delete product");
-    }
-  };
-
   const filteredProducts = products
     .filter((product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -85,9 +65,7 @@ const SellerProductManager = () => {
               <option value="Clothing">Clothing</option>
               <option value="Books">Books</option>
               <option value="Home & Kitchen">Home & Kitchen</option>
-              <option value="Beauty & Personal Care">
-                Beauty & Personal Care
-              </option>
+              <option value="Beauty & Personal Care">Beauty & Personal Care</option>
               <option value="Sports & Outdoors">Sports & Outdoors</option>
               <option value="Toys & Games">Toys & Games</option>
               <option value="Automotive">Automotive</option>
@@ -121,13 +99,10 @@ const SellerProductManager = () => {
               No matching products.
             </p>
           ) : (
-            filteredProducts.map((product, idx) => (
-              <SellerProductCard
-                key={product._id || idx}
-                product={product}
-                onEdit={() => handleEdit(idx)}
-                onDelete={() => handleDelete(idx)}
-              />
+            filteredProducts.map((product) => (
+              <div key={product._id} onClick={() => handleCardClick(product._id)} className="cursor-pointer hover:scale-105 transition-transform duration-200">
+                <SellerProductCard product={product} />
+              </div>
             ))
           )}
         </div>

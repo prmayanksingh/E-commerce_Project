@@ -80,7 +80,7 @@ const EditProduct = () => {
         }
       );
       toast.success("Product updated successfully");
-      navigate("/dashboard"); // navigate instantly, no delay
+      navigate("/dashboard");
     } catch (err) {
       toast.error("Failed to update product");
     }

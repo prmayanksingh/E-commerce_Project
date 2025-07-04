@@ -83,4 +83,17 @@ router.get("/all", async (req, res) => {
   }
 });
 
+// GET /api/products/:id - Get single product by ID (public)
+router.get("/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id).populate("sellerId", "name");
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json({ message: "Server error while fetching product" });
+  }
+});
+
 module.exports = router;
