@@ -6,7 +6,11 @@ const router = express.Router();
 // Get current user's cart
 router.get("/", authenticate, async (req, res) => {
   try {
-    let cart = await Cart.findOne({ userId: req.user.id }).populate("products.product");
+    let cart = await Cart.findOne({ userId: req.user.id })
+      .populate({
+        path: "products.product",
+        populate: { path: "sellerId", select: "name" }
+      });
     if (!cart) cart = await Cart.create({ userId: req.user.id, products: [] });
     res.json(cart);
   } catch (err) {
@@ -27,7 +31,10 @@ router.post("/add", authenticate, async (req, res) => {
       cart.products.push({ product: productId, quantity: 1 });
       await cart.save();
     }
-    cart = await cart.populate("products.product");
+    cart = await cart.populate({
+      path: "products.product",
+      populate: { path: "sellerId", select: "name" }
+    });
     res.json(cart);
   } catch (err) {
     console.error(err);
@@ -57,7 +64,10 @@ router.post("/remove", authenticate, async (req, res) => {
         }
       });
       await cart.save();
-      cart = await cart.populate("products.product");
+      cart = await cart.populate({
+        path: "products.product",
+        populate: { path: "sellerId", select: "name" }
+      });
       console.log("[Cart Remove] Cart after:", cart.products);
     } else {
       // If no cart exists, create an empty one
