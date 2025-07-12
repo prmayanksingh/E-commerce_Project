@@ -48,7 +48,7 @@ const SellerProductManager = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
       <SellerNavBar />
 
-      <div className="max-w-6xl mx-auto px-6 pt-10 pb-16">
+      <div className="max-w-8xl mx-auto px-6 pt-10 pb-16">
         <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-center gap-8 mb-10">
           <div className="flex-1 max-w-md">
             <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />

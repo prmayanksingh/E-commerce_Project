@@ -79,12 +79,6 @@ const ProductDetailsBuyer = () => {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <div className="px-4 py-2 bg-[#00ffc3]/10 border border-[#00ffc3] rounded shadow shadow-[#00ffc3] w-fit">
-                <p className="text-white text-sm font-medium">
-                  Stock: {product.stock}
-                </p>
-              </div>
-
               <div className="px-4 py-2 bg-[#ff6bff]/10 border border-[#ff6bff] rounded shadow shadow-[#ff6bff] w-fit">
                 <p className="text-white text-sm font-medium">
                   {product.category}

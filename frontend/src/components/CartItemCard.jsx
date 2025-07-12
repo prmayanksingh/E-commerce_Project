@@ -7,7 +7,7 @@ const CartItemCard = ({ product }) => {
   const { removeFromCart } = useCart();
 
   const handleRemove = (e) => {
-    e.stopPropagation(); // Prevent navigation when clicking remove
+    e.stopPropagation();
     removeFromCart(product._id);
   };
 
@@ -29,10 +29,13 @@ const CartItemCard = ({ product }) => {
           {product.name}
         </h3>
         <p className="text-sm text-gray-300 mb-1">
-          ₹{product.price} • {product.stock} pcs
+          ₹{product.price}
         </p>
         <p className="text-sm text-pink-400 font-medium mb-2">
           {product.category}
+        </p>
+        <p className="text-sm text-green-400 font-medium">
+          Quantity: {product.quantity || 1}
         </p>
         <p className="text-xs text-gray-400 italic mt-2">
           Seller: {product.sellerId?.name || "Unknown"}
@@ -48,4 +51,4 @@ const CartItemCard = ({ product }) => {
   );
 };
 
-export default CartItemCard; 
+export default CartItemCard;
