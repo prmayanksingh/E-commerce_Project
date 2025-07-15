@@ -12,7 +12,7 @@ const CartPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
       <ProductNavBar />
 
-      <div className="w-full mx-auto px-10 pt-6 pb-16">
+      <div className="max-w-396 mx-auto px-10 pt-6 pb-16">
         <div className="mb-6">
           <button
             onClick={() => navigate(-1)}
