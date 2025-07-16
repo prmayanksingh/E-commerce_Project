@@ -8,30 +8,38 @@ const ProductNavBar = () => {
 
   const handleLogout = () => {
     sessionStorage.removeItem("token");
-    navigate("/");
+    navigate("/login");
   };
 
   return (
-    <div className="w-full px-13 py-4 backdrop-blur-md bg-gray-900/70 border-b border-white/10 shadow-sm sticky top-0 z-10">
-      <div className="w-full mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-        <h2 className="text-4xl archivo-black-regular bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent drop-shadow-md tracking-wide">
+    <div className="w-full px-13 py-4 bg-gray-900/70 backdrop-blur-md border-b border-white/10 shadow-sm sticky top-0 z-10">
+      <div className="flex justify-between items-center gap-4 max-w-6xl mx-auto">
+        <h2
+          className="text-4xl archivo-black-regular bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent tracking-wide"
+          onClick={() => navigate("/browse")}
+        >
           CART HIVE
         </h2>
+
         <div className="flex gap-3 items-center">
           <button
             onClick={() => navigate("/cart")}
             className="relative bg-gray-800 hover:bg-gray-700 text-white px-4 py-1.5 rounded-md font-medium shadow flex items-center"
           >
-            <span role="img" aria-label="cart" className="mr-2">
-              🛒
-            </span>
+            <span role="img" aria-label="cart" className="mr-2">🛒</span>
             Cart
             {cart.length > 0 && (
-              <span className="ml-2 bg-pink-500 text-white rounded-full px-2 py-0.5 text-xs">
-                {cart.length}
-              </span>
+              <span className="ml-2 bg-pink-500 text-white rounded-full px-2 py-0.5 text-xs">{cart.length}</span>
             )}
           </button>
+
+          <button
+            onClick={() => navigate("/orders")}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md font-medium shadow"
+          >
+            Orders
+          </button>
+
           <button
             onClick={handleLogout}
             className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-md font-medium shadow"

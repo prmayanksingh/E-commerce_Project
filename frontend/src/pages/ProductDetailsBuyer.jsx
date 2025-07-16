@@ -3,12 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ProductNavBar from "../components/ProductNavBar";
 import { useCart } from "../context/CartContext";
-import { toast } from "react-toastify";
+import OrderSummary from "../components/OrderSummary";
 
 const ProductDetailsBuyer = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
+  const [showBuyNow, setShowBuyNow] = useState(false);
   const { addToCart, removeFromCart, isInCart } = useCart();
 
   useEffect(() => {
@@ -30,13 +31,8 @@ const ProductDetailsBuyer = () => {
   }
 
   const inCart = isInCart(product._id);
-
   const handleCartClick = () => {
-    if (inCart) {
-      removeFromCart(product._id);
-    } else {
-      addToCart(product);
-    }
+    inCart ? removeFromCart(product._id) : addToCart(product);
   };
 
   return (
@@ -63,15 +59,13 @@ const ProductDetailsBuyer = () => {
           </div>
 
           <div className="w-full lg:w-[55%] space-y-3">
-            <div>
-              <h2 className="text-4xl font-bold capitalize">{product.name}</h2>
-              <div className="flex gap-1 mt-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <span key={star} className="text-yellow-400 text-xl">
-                    ★
-                  </span>
-                ))}
-              </div>
+            <h2 className="text-4xl font-bold capitalize">{product.name}</h2>
+            <div className="flex gap-1 mt-2">
+              {[...Array(5)].map((_, i) => (
+                <span key={i} className="text-yellow-400 text-xl">
+                  ★
+                </span>
+              ))}
             </div>
 
             <p className="text-2xl font-semibold text-green-300 mb-5">
@@ -79,13 +73,12 @@ const ProductDetailsBuyer = () => {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <div className="px-4 py-2 bg-[#ff6bff]/10 border border-[#ff6bff] rounded shadow shadow-[#ff6bff] w-fit">
+              <div className="px-4 py-2 bg-[#ff6bff]/10 border border-[#ff6bff] rounded">
                 <p className="text-white text-sm font-medium">
                   {product.category}
                 </p>
               </div>
-
-              <div className="px-4 py-2 bg-[#00bfff]/10 border border-[#00bfff] rounded shadow shadow-[#00bfff] w-fit">
+              <div className="px-4 py-2 bg-[#00bfff]/10 border border-[#00bfff] rounded">
                 <p className="text-white text-sm font-medium">
                   {product.sellerId?.name || "Unknown"}
                 </p>
@@ -93,7 +86,7 @@ const ProductDetailsBuyer = () => {
             </div>
 
             {product.description && (
-              <div className="bg-gray-700 p-5 mt-8 rounded-xl text-sm leading-relaxed text-gray-100 shadow-md border border-gray-600">
+              <div className="bg-gray-700 p-5 mt-8 rounded-xl text-gray-100 border border-gray-600">
                 <p className="font-semibold text-white mb-2">Description:</p>
                 <p>{product.description}</p>
               </div>
@@ -110,12 +103,23 @@ const ProductDetailsBuyer = () => {
               >
                 {inCart ? "Remove from Cart" : "Add to Cart"} 🛒
               </button>
-              <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md">
+              <button
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md"
+                onClick={() => setShowBuyNow(true)}
+              >
                 Buy Now
               </button>
             </div>
           </div>
         </div>
+
+        {showBuyNow && (
+          <OrderSummary
+            cart={[{ ...product, quantity: 1 }]}
+            totalPrice={product.price}
+            onClose={() => setShowBuyNow(false)}
+          />
+        )}
       </div>
     </div>
   );

@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
 import CartItemCard from "../components/CartItemCard";
 import { useNavigate } from "react-router-dom";
 import ProductNavBar from "../components/ProductNavBar";
+import OrderSummary from "../components/OrderSummary";
 
 const CartPage = () => {
   const { cart, loading, getTotalItems, getTotalPrice } = useCart();
+  const [showSummary, setShowSummary] = useState(false);
   const navigate = useNavigate();
 
   return (
@@ -34,14 +36,12 @@ const CartPage = () => {
           </div>
         ) : (
           <>
-            {/* Cart Items */}
             <div className="flex flex-wrap justify-center gap-6 mt-4">
               {cart.map((product) => (
                 <CartItemCard key={product._id} product={product} />
               ))}
             </div>
 
-            {/* Summary Section */}
             <div className="mt-12 bg-gray-800 p-6 rounded-xl shadow-lg max-w-md mx-auto text-center">
               <h3 className="text-xl font-semibold mb-4">Cart Summary</h3>
               <p className="text-lg">
@@ -52,10 +52,21 @@ const CartPage = () => {
                 <span className="font-medium text-gray-300">Total Price:</span>{" "}
                 <span className="text-green-400">₹{getTotalPrice()}</span>
               </p>
-              <button className="mt-6 w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded transition">
+              <button
+                onClick={() => setShowSummary(true)}
+                className="mt-6 w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded transition"
+              >
                 Proceed to Checkout
               </button>
             </div>
+
+            {showSummary && (
+              <OrderSummary
+                cart={cart}
+                totalPrice={getTotalPrice()}
+                onClose={() => setShowSummary(false)}
+              />
+            )}
           </>
         )}
       </div>

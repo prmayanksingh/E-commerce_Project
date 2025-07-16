@@ -44,6 +44,18 @@ export const CartProvider = ({ children }) => {
     if (token) fetchCart();
   }, []);
 
+  // 🔄 Listen to login event and refetch cart
+  useEffect(() => {
+    const handleLogin = () => {
+      fetchCart();
+    };
+
+    window.addEventListener("userLogin", handleLogin);
+    return () => {
+      window.removeEventListener("userLogin", handleLogin);
+    };
+  }, []);
+
   const addToCart = async (product) => {
     try {
       const res = await API.post("/cart/add", { productId: product._id });
