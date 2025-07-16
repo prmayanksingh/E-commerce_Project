@@ -64,7 +64,6 @@ const OrdersPage = () => {
                     <div className="font-semibold">{item.product.name}</div>
                     <div>Quantity: {item.quantity}</div>
                     <div>Price: ₹{item.product.price}</div>
-                    <div>Total: ₹{item.product.price * item.quantity}</div>
                   </li>
                 ))}
               </ul>

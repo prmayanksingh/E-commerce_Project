@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -7,17 +7,31 @@ import API from "../utils/api";
 const OrderSummary = ({ cart, totalPrice, onClose }) => {
   const navigate = useNavigate();
   const { refreshCart } = useCart();
+  const [localCart, setLocalCart] = useState(cart.map(item => ({ ...item })));
+
+  const updateQuantity = (index, delta) => {
+    setLocalCart(prev => prev.map((item, i) => {
+      if (i === index) {
+        const newQty = Math.max(1, (item.quantity || 1) + delta);
+        return { ...item, quantity: newQty };
+      }
+      return item;
+    }));
+  };
+
+  const calcTotalPrice = () =>
+    localCart.reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0);
 
   const confirmOrder = async () => {
     try {
-      const products = cart.map((item) => ({
+      const products = localCart.map((item) => ({
         product: item._id,
         quantity: item.quantity || 1,
       }));
 
       await API.post("/orders", {
         products,
-        totalAmount: totalPrice,
+        totalAmount: calcTotalPrice(),
       });
 
       toast.success("Order placed successfully ✅");
@@ -36,10 +50,25 @@ const OrderSummary = ({ cart, totalPrice, onClose }) => {
         <h2 className="text-2xl font-bold text-center">Order Summary</h2>
 
         <ul className="max-h-64 overflow-y-auto">
-          {cart.map((item) => (
+          {localCart.map((item, idx) => (
             <li key={item._id} className="border-b py-2">
               <div className="font-semibold">{item.name}</div>
-              <div>Quantity: {item.quantity || 1}</div>
+              <div className="flex items-center gap-2">
+                <button
+                  className="px-2 py-1 bg-gray-300 rounded text-black font-bold"
+                  onClick={() => updateQuantity(idx, -1)}
+                  disabled={item.quantity <= 1}
+                >
+                  -
+                </button>
+                <span>Quantity: {item.quantity || 1}</span>
+                <button
+                  className="px-2 py-1 bg-gray-300 rounded text-black font-bold"
+                  onClick={() => updateQuantity(idx, 1)}
+                >
+                  +
+                </button>
+              </div>
               <div>Price: ₹{item.price}</div>
               <div>
                 Total: ₹{(item.price * (item.quantity || 1)).toFixed(2)}
@@ -48,7 +77,7 @@ const OrderSummary = ({ cart, totalPrice, onClose }) => {
           ))}
         </ul>
 
-        <div className="text-lg font-semibold">Total Amount: ₹{totalPrice}</div>
+        <div className="text-lg font-semibold">Total Amount: ₹{calcTotalPrice()}</div>
 
         <div className="flex justify-between mt-4">
           <button

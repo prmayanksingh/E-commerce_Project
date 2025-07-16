@@ -17,7 +17,7 @@ const CartPage = () => {
       <div className="max-w-396 mx-auto px-10 pt-6 pb-16">
         <div className="mb-6">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/products")}
             className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
           >
             ← Back
