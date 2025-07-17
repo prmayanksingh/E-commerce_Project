@@ -2,6 +2,8 @@ const express = require("express");
 const Product = require("../models/Product");
 const authenticate = require("../middleware/authMiddleware");
 const router = express.Router();
+const Review = require("../models/Review");
+const User = require("../models/User");
 
 // POST /api/products - Add new product (protected)
 router.post("/", authenticate, async (req, res) => {
@@ -90,9 +92,74 @@ router.get("/:id", async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-    res.status(200).json(product);
+    // Calculate average rating
+    const reviews = await Review.find({ productId: req.params.id });
+    const avgRating = reviews.length
+      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(2)
+      : null;
+    res.status(200).json({ ...product.toObject(), avgRating });
   } catch (error) {
     res.status(500).json({ message: "Server error while fetching product" });
+  }
+});
+
+// Get all reviews for a product
+router.get("/:id/reviews", async (req, res) => {
+  try {
+    const reviews = await Review.find({ productId: req.params.id })
+      .populate({ path: "userId", select: "name" })
+      .sort({ updatedAt: -1 });
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching reviews" });
+  }
+});
+
+// Create or update a review for a product (buyer only, one per user per product)
+router.post('/:id/review', authenticate, async (req, res) => {
+  try {
+    const { rating, feedback } = req.body;
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ message: 'Rating (1-5) is required' });
+    }
+    // Upsert review (one per user per product)
+    const review = await Review.findOneAndUpdate(
+      { productId: req.params.id, userId: req.user.id },
+      { rating, feedback, updatedAt: new Date() },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+    const populated = await review.populate({ path: 'userId', select: 'name' });
+    res.json(populated);
+  } catch (err) {
+    res.status(500).json({ message: 'Error submitting review' });
+  }
+});
+
+// Edit own review
+router.put("/review/:reviewId", authenticate, async (req, res) => {
+  try {
+    const { rating, feedback } = req.body;
+    const review = await Review.findOne({ _id: req.params.reviewId, userId: req.user.id });
+    if (!review) return res.status(404).json({ message: "Review not found" });
+    if (rating) review.rating = rating;
+    if (feedback !== undefined) review.feedback = feedback;
+    review.updatedAt = new Date();
+    await review.save();
+    const populated = await review.populate({ path: "userId", select: "name" });
+    res.json(populated);
+  } catch (err) {
+    res.status(500).json({ message: "Error editing review" });
+  }
+});
+
+// Delete own review
+router.delete("/review/:reviewId", authenticate, async (req, res) => {
+  try {
+    const review = await Review.findOneAndDelete({ _id: req.params.reviewId, userId: req.user.id });
+    if (!review) return res.status(404).json({ message: "Review not found" });
+    res.json({ message: "Review deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Error deleting review" });
   }
 });
 
