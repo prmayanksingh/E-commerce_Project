@@ -11,6 +11,7 @@ import ProductDetailsSeller from "../pages/ProductDetailsSeller";
 import CartPage from "../pages/CartPage";
 import ProtectedRoute from "./ProtectedRoute";
 import OrdersPage from "../pages/OrdersPage";
+import NotificationPage from "../pages/NotificationPage";
 
 const MainRoute = () => {
   return (
@@ -88,6 +89,14 @@ const MainRoute = () => {
         element={
           <ProtectedRoute>
             <OrdersPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/seller/notifications"
+        element={
+          <ProtectedRoute>
+            <NotificationPage />
           </ProtectedRoute>
         }
       />

@@ -22,6 +22,21 @@ router.post("/", authenticate, async (req, res) => {
       sellerId: req.user.id || req.user._id,
     });
     await product.save();
+    // Add notification if product is created with stock 0
+    if (stock == 0) {
+      const user = await User.findById(product.sellerId);
+      const alreadyNotified = user.notifications.some(n => n.productId && n.productId.toString() === product._id.toString());
+      if (!alreadyNotified) {
+        user.notifications.push({
+          message: `Product '${product.name}' is out of stock`,
+          productId: product._id,
+          productName: product.name,
+          productImage: product.imageURL,
+        });
+        await user.save();
+        console.log(`[NOTIF] Out of stock notification created for product '${product.name}' on creation.`);
+      }
+    }
     res.status(201).json({ message: "Product created", product });
   } catch (error) {
     res.status(500).json({ message: "Server error while adding product" });
@@ -62,6 +77,7 @@ router.put("/:id", authenticate, async (req, res) => {
       return res.status(403).json({ message: "Not authorized to update this product" });
     }
     const { name, description, price, stock, category, imageURL } = req.body;
+    const prevStock = product.stock;
     product.name = name;
     product.description = description;
     product.price = price;
@@ -69,6 +85,21 @@ router.put("/:id", authenticate, async (req, res) => {
     product.category = category;
     product.imageURL = imageURL;
     await product.save();
+    // If stock just reached 0, add notification for seller
+    if (prevStock > 0 && stock == 0) {
+      const user = await User.findById(product.sellerId);
+      const alreadyNotified = user.notifications.some(n => n.productId && n.productId.toString() === product._id.toString());
+      if (!alreadyNotified) {
+        user.notifications.push({
+          message: `Product '${product.name}' is out of stock`,
+          productId: product._id,
+          productName: product.name,
+          productImage: product.imageURL,
+        });
+        await user.save();
+        console.log(`[NOTIF] Out of stock notification created for product '${product.name}' on update.`);
+      }
+    }
     res.status(200).json({ message: "Product updated", product });
   } catch (error) {
     res.status(500).json({ message: "Server error while updating product" });
@@ -82,6 +113,38 @@ router.get("/all", async (req, res) => {
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: "Server error while fetching all products" });
+  }
+});
+
+// GET /api/products/notifications - Get all notifications for the seller
+router.get("/notifications", authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id || req.user._id);
+    res.status(200).json(user.notifications || []);
+  } catch (error) {
+    res.status(500).json({ message: "Server error while fetching notifications" });
+  }
+});
+
+// GET /api/products/out-of-stock - Get all out-of-stock products for the logged-in seller (protected)
+router.get("/out-of-stock", authenticate, async (req, res) => {
+  try {
+    const products = await Product.find({ sellerId: req.user.id || req.user._id, stock: 0 });
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Server error while fetching out-of-stock products" });
+  }
+});
+
+// DELETE /api/products/notifications/clear - Clear all notifications for the seller
+router.delete("/notifications/clear", authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id || req.user._id);
+    user.notifications = [];
+    await user.save();
+    res.status(200).json({ message: "Notifications cleared" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error while clearing notifications" });
   }
 });
 
@@ -99,6 +162,7 @@ router.get("/:id", async (req, res) => {
       : null;
     res.status(200).json({ ...product.toObject(), avgRating });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error while fetching product" });
   }
 });

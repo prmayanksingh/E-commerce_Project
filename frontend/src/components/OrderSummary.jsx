@@ -12,7 +12,8 @@ const OrderSummary = ({ cart, totalPrice, onClose }) => {
   const updateQuantity = (index, delta) => {
     setLocalCart(prev => prev.map((item, i) => {
       if (i === index) {
-        const newQty = Math.max(1, (item.quantity || 1) + delta);
+        // Limit quantity between 1 and item.stock (available stock)
+        const newQty = Math.max(1, Math.min((item.quantity || 1) + delta, item.stock || 1));
         return { ...item, quantity: newQty };
       }
       return item;
@@ -65,6 +66,7 @@ const OrderSummary = ({ cart, totalPrice, onClose }) => {
                 <button
                   className="px-2 py-1 bg-gray-300 rounded text-black font-bold"
                   onClick={() => updateQuantity(idx, 1)}
+                  disabled={item.quantity >= (item.stock || 1)}
                 >
                   +
                 </button>

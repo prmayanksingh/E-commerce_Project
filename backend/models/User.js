@@ -19,6 +19,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "buyer",
     },
+    notifications: [
+      {
+        message: String,
+        productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        productName: String,
+        productImage: String,
+        createdAt: { type: Date, default: Date.now },
+      }
+    ],
   },
   {
     timestamps: true,

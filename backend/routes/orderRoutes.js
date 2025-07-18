@@ -4,6 +4,7 @@ const authenticate = require("../middleware/authMiddleware");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const Cart = require("../models/Cart");
+const User = require("../models/User");
 
 // Create order
 router.post("/", authenticate, async (req, res) => {
@@ -25,6 +26,21 @@ router.post("/", authenticate, async (req, res) => {
       }
       productDoc.stock -= item.quantity;
       await productDoc.save();
+      // Add out-of-stock notification if stock reaches 0
+      if (productDoc.stock === 0) {
+        const seller = await User.findById(productDoc.sellerId);
+        const alreadyNotified = seller.notifications.some(n => n.productId && n.productId.toString() === productDoc._id.toString());
+        if (!alreadyNotified) {
+          seller.notifications.push({
+            message: `Product '${productDoc.name}' is out of stock`,
+            productId: productDoc._id,
+            productName: productDoc.name,
+            productImage: productDoc.imageURL,
+          });
+          await seller.save();
+          console.log(`[NOTIF] Out of stock notification created for product '${productDoc.name}' on order.`);
+        }
+      }
     }
 
     const order = await Order.create({

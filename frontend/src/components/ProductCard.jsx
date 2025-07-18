@@ -9,7 +9,7 @@ const ProductCard = ({ product, onCardClick }) => {
       onClick={() =>
         onCardClick ? onCardClick(product) : navigate(`/product/${product._id}`)
       }
-      className="cursor-pointer hover:scale-105 transition duration-300 bg-[#1e293b] bg-opacity-90 backdrop-blur-md rounded-xl overflow-hidden shadow-md border border-white/10 mb-4"
+      className={`cursor-pointer hover:scale-105 transition duration-300 bg-[#1e293b] bg-opacity-90 backdrop-blur-md rounded-xl overflow-hidden shadow-md border border-white/10 mb-4${product.stock === 0 ? ' opacity-50' : ''}`}
       style={{ width: "280px" }}
     >
       <div className="h-60">
@@ -27,6 +27,9 @@ const ProductCard = ({ product, onCardClick }) => {
         <p className="text-sm text-pink-400 font-medium mb-2">
           {product.category}
         </p>
+        {product.stock === 0 && (
+          <div className="text-red-400 font-bold text-base mb-1">Out of Stock</div>
+        )}
         <p className="text-xs text-gray-400 italic mt-2">
           Seller: {product.sellerId?.name || "Unknown"}
         </p>

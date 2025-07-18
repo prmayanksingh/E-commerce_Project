@@ -166,7 +166,7 @@ const ProductDetailsBuyer = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
       <ProductNavBar />
       <div className="max-w-7xl mx-auto px-4 pt-6 pb-16">
-        <div className="mb-6">
+        <div className="mb-6 flex justify-start">
           <button
             onClick={() => navigate("/products")}
             className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
@@ -184,6 +184,9 @@ const ProductDetailsBuyer = () => {
           </div>
           <div className="w-full lg:w-[55%] space-y-3">
             <h2 className="text-4xl font-bold capitalize">{product.name}</h2>
+            {product.stock === 0 && (
+              <div className="text-red-400 font-bold text-lg mb-2">Out of Stock</div>
+            )}
             {/* Average rating display */}
             <div className="flex items-center gap-2 mt-2">
               {avgRating ? (
@@ -224,13 +227,27 @@ const ProductDetailsBuyer = () => {
                     ? "bg-red-600 hover:bg-red-700"
                     : "bg-blue-600 hover:bg-blue-700"
                 } text-white px-6 py-2 rounded-md`}
-                onClick={handleCartClick}
+                onClick={() => {
+                  if (product.stock === 0) {
+                    toast.error("Product is out of stock");
+                    return;
+                  }
+                  handleCartClick();
+                }}
+                disabled={product.stock === 0}
               >
                 {inCart ? "Remove from Cart" : "Add to Cart"} 🛒
               </button>
               <button
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md"
-                onClick={() => setShowBuyNow(true)}
+                onClick={() => {
+                  if (product.stock === 0) {
+                    toast.error("Product is out of stock");
+                    return;
+                  }
+                  setShowBuyNow(true);
+                }}
+                disabled={product.stock === 0}
               >
                 Buy Now
               </button>
