@@ -23,18 +23,6 @@ const renderStars = (rating) => {
   );
 };
 
-const getUserId = () => {
-  try {
-    const token = sessionStorage.getItem("token");
-    if (!token) return null;
-    // JWT decode (naive, for demo)
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload.id || payload._id || payload.userId;
-  } catch {
-    return null;
-  }
-};
-
 const ProductDetailsBuyer = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -51,7 +39,15 @@ const ProductDetailsBuyer = () => {
   const [editId, setEditId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const { addToCart, removeFromCart, isInCart } = useCart();
-  const userId = getUserId();
+  // Inline JWT decoding for userId
+  let userId = null;
+  const token = sessionStorage.getItem("token");
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      userId = payload.id || payload._id || payload.userId;
+    } catch {}
+  }
 
   useEffect(() => {
     // Fetch product details (with avgRating)

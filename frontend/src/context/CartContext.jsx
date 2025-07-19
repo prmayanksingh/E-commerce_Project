@@ -6,12 +6,29 @@ import { toast } from "react-toastify";
 const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
+// Helper to check if the current user is admin
+function isAdmin() {
+  try {
+    const token = sessionStorage.getItem("token");
+    if (!token) return false;
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.role === "admin";
+  } catch {
+    return false;
+  }
+}
+
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
 
   const fetchCart = async () => {
+    if (isAdmin()) {
+      setCart([]);
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const token = sessionStorage.getItem("token");
@@ -19,17 +36,14 @@ export const CartProvider = ({ children }) => {
         setCart([]);
         return;
       }
-
       const res = await API.get("/cart");
       const products = res.data.products || [];
-
       const parsed = products
         .filter((p) => p.product && p.product._id)
         .map((p) => ({
           ...p.product,
           quantity: p.quantity,
         }));
-
       setCart(parsed);
     } catch (error) {
       console.error("Error fetching cart:", error);
@@ -41,7 +55,7 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
-    if (token) fetchCart();
+    if (token && !isAdmin()) fetchCart();
   }, []);
 
   // 🔄 Listen to login event and refetch cart

@@ -22,7 +22,7 @@ const SellerProductCard = ({ product }) => {
         />
       </div>
       <div className="p-4 pt-3 text-center">
-        <h2 className="capitalize text-lg font-bold text-white mb-1">
+        <h2 className="capitalize text-lg font-bold text-white mb-1 truncate" style={{ maxWidth: '200px', margin: '0 auto' }}>
           {product.name}
         </h2>
         <p className="text-sm text-gray-300 mb-1">

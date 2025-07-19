@@ -20,7 +20,7 @@ const ProductCard = ({ product, onCardClick }) => {
         />
       </div>
       <div className="p-4 pt-3 text-center">
-        <h3 className="capitalize text-xl font-bold text-white mb-1">
+        <h3 className="capitalize text-xl font-bold text-white mb-1 truncate" style={{ maxWidth: '200px', margin: '0 auto' }}>
           {product.name}
         </h3>
         <p className="text-sm text-gray-300 mb-1">₹{product.price}</p>

@@ -13,7 +13,7 @@ const registerController = async (req, res) => {
     }
 
     // Set a default role if not provided
-    const userRole = role || "user";
+    const userRole = role || "buyer";
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -47,6 +47,10 @@ const loginController = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.isBlocked) {
+      return res.status(403).json({ message: "Your account is blocked by the admin." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);

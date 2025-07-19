@@ -12,6 +12,10 @@ import CartPage from "../pages/CartPage";
 import ProtectedRoute from "./ProtectedRoute";
 import OrdersPage from "../pages/OrdersPage";
 import NotificationPage from "../pages/NotificationPage";
+import AdminDashboard from "../pages/AdminDashboard";
+import AdminProductDetails from "../pages/AdminProductDetails";
+import AdminBuyers from "../pages/AdminBuyers";
+import AdminSellers from "../pages/AdminSellers";
 
 const MainRoute = () => {
   return (
@@ -97,6 +101,38 @@ const MainRoute = () => {
         element={
           <ProtectedRoute>
             <NotificationPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/product/:id"
+        element={
+          <ProtectedRoute>
+            <AdminProductDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/buyers"
+        element={
+          <ProtectedRoute>
+            <AdminBuyers />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/sellers"
+        element={
+          <ProtectedRoute>
+            <AdminSellers />
           </ProtectedRoute>
         }
       />

@@ -1,6 +1,6 @@
 const express = require("express");
 const Cart = require("../models/Cart");
-const authenticate = require("../middleware/authMiddleware");
+const { authenticate } = require("../middleware/authMiddleware");
 const router = express.Router();
 
 // Get current user's cart

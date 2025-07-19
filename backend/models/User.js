@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "buyer",
     },
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
     notifications: [
       {
         message: String,

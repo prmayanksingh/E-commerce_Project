@@ -19,7 +19,9 @@ const Login = () => {
 
       sessionStorage.setItem("token", res.data.token);
 
-      if (res.data.user.role === "seller") {
+      if (res.data.user.role === "admin") {
+        navigate("/admin");
+      } else if (res.data.user.role === "seller") {
         navigate("/dashboard");
       } else {
         navigate("/browse");
@@ -31,7 +33,11 @@ const Login = () => {
         }, 100);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Login Failed");
+      if (error.response?.status === 403 && error.response?.data?.message === "Your account is blocked by the admin.") {
+        toast.error("Your account is blocked by the admin.");
+      } else {
+        toast.error(error.response?.data?.message || "Login Failed");
+      }
     }
   };
 
