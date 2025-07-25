@@ -2,10 +2,25 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import SellerNavBar from "../components/SellerNavBar";
+import AdminNavBar from "../components/AdminNavBar";
 
 const NotificationPage = () => {
   const [notifications, setNotifications] = useState([]);
+  const [unblockRequests, setUnblockRequests] = useState([]);
+  const [loadingUnblock, setLoadingUnblock] = useState(false);
   const navigate = useNavigate();
+
+  // Helper to check if user is admin
+  function isAdmin() {
+    try {
+      const token = sessionStorage.getItem("token");
+      if (!token) return false;
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload.role === "admin";
+    } catch {
+      return false;
+    }
+  }
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -21,6 +36,86 @@ const NotificationPage = () => {
     };
     fetchNotifications();
   }, []);
+
+  useEffect(() => {
+    if (isAdmin()) {
+      setLoadingUnblock(true);
+      axios.get("http://localhost:5000/api/admin/unblock-requests", {
+        headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
+      })
+        .then(res => setUnblockRequests(res.data || []))
+        .catch(() => setUnblockRequests([]))
+        .finally(() => setLoadingUnblock(false));
+    }
+  }, []);
+
+  const handleResolve = async (id) => {
+    try {
+      await axios.patch(`http://localhost:5000/api/admin/unblock-requests/${id}/resolve`, {}, {
+        headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
+      });
+      setUnblockRequests(prev => prev.map(r => r._id === id ? { ...r, status: "resolved" } : r));
+    } catch {}
+  };
+
+  // NEW: Clear all unblock requests
+  const handleClearRequests = async () => {
+    try {
+      await axios.delete("http://localhost:5000/api/admin/unblock-requests/clear", {
+        headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
+      });
+      setUnblockRequests([]);
+    } catch {}
+  };
+
+  if (isAdmin()) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center">
+        <AdminNavBar />
+        <div className="w-full max-w-5xl px-4 py-10 flex flex-col items-center">
+          <h2 className="text-3xl font-bold mb-4">Notifications</h2>
+          <div className="flex gap-4 mb-8">
+            <button
+              onClick={() => navigate("/admin")}
+              className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-md"
+            >
+              Back to Dashboard
+            </button>
+            <button
+              onClick={handleClearRequests}
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md"
+            >
+              Clear Requests
+            </button>
+          </div>
+          {loadingUnblock ? (
+            <div className="text-gray-400 text-lg mb-8">Loading requests...</div>
+          ) : unblockRequests.length === 0 ? (
+            <div className="text-gray-400 text-lg mb-8">No requests 🎉</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 w-full">
+              {unblockRequests.map((req) => (
+                <div key={req._id} className="bg-gray-800 rounded-xl p-6 flex flex-col items-start shadow border border-blue-500/30">
+                  <div className="mb-2"><span className="font-bold">User:</span> {req.user?.name} ({req.user?.email})</div>
+                  <div className="mb-2"><span className="font-bold">Message:</span> {req.message}</div>
+                  <div className="mb-2 text-xs text-gray-400">{new Date(req.createdAt).toLocaleString()}</div>
+                  <div className="mb-2"><span className="font-bold">Status:</span> {req.status}</div>
+                  {req.status === "pending" && (
+                    <button
+                      onClick={() => handleResolve(req._id)}
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded mt-2"
+                    >
+                      Mark as Resolved
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   const handleClear = async () => {
     try {

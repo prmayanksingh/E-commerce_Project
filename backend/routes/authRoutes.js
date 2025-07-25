@@ -1,5 +1,5 @@
 const express = require("express");
-const { registerController, loginController } = require("../controllers/authController");
+const { registerController, loginController, createUnblockRequest } = require("../controllers/authController");
 const { authenticate } = require("../middleware/authMiddleware");
 const router = express.Router();
  
@@ -15,5 +15,7 @@ router.get("/profile", authenticate, (req, res) => {
     },
   });
 });
+
+router.post("/unblock-request", createUnblockRequest);
 
 module.exports = router;

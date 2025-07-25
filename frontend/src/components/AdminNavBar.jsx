@@ -1,12 +1,19 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { useState } from "react";
 
 const AdminNavBar = () => {
   const navigate = useNavigate();
+  const [notifSeen, setNotifSeen] = useState(false);
 
   const handleLogout = () => {
     sessionStorage.removeItem("token");
     navigate("/login");
+  };
+
+  const handleNotifClick = () => {
+    setNotifSeen(true);
+    navigate("/notifications");
   };
 
   return (
@@ -27,6 +34,13 @@ const AdminNavBar = () => {
             className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 rounded-md font-medium shadow"
           >
             Sellers
+          </button>
+          <button
+            onClick={handleNotifClick}
+            className="relative bg-gray-800 hover:bg-gray-700 text-white font-medium py-1.5 px-4 rounded-md text-sm flex items-center"
+            title="Notifications"
+          >
+            <span className="material-icons">🔔</span>
           </button>
           <button
             onClick={handleLogout}

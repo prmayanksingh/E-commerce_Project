@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const UnblockRequest = require("../models/UnblockRequest");
 
 const registerController = async (req, res) => {
   try {
@@ -87,7 +88,36 @@ const loginController = async (req, res) => {
   }
 };
 
+// Blocked user sends unblock request message to admin
+const createUnblockRequest = async (req, res) => {
+  try {
+    let user;
+    if (req.user) {
+      user = await User.findById(req.user.id);
+    } else if (req.body.email) {
+      user = await User.findOne({ email: req.body.email });
+    }
+    const { message } = req.body;
+    if (!user || !user.isBlocked) {
+      return res.status(403).json({ message: "Only blocked users can send unblock requests." });
+    }
+    if (!message || !message.trim()) {
+      return res.status(400).json({ message: "Message is required." });
+    }
+    const unblockRequest = new UnblockRequest({
+      user: user._id,
+      message,
+    });
+    await unblockRequest.save();
+    res.status(201).json({ message: "Unblock request sent successfully." });
+  } catch (error) {
+    console.error("Error creating unblock request:", error);
+    res.status(500).json({ message: "Server error while sending unblock request." });
+  }
+};
+
 module.exports = {
   registerController,
   loginController,
+  createUnblockRequest,
 };

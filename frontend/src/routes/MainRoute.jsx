@@ -97,12 +97,8 @@ const MainRoute = () => {
         }
       />
       <Route
-        path="/seller/notifications"
-        element={
-          <ProtectedRoute>
-            <NotificationPage />
-          </ProtectedRoute>
-        }
+        path="/notifications"
+        element={<NotificationPage />}
       />
       <Route
         path="/admin"
