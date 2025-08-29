@@ -12,6 +12,8 @@ const ProductList = () => {
 
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedPriceRange, setSelectedPriceRange] = useState("all");
+  const [sortOrder, setSortOrder] = useState("none");
+  const [panelOpen, setPanelOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -37,6 +39,12 @@ const ProductList = () => {
       return product.price >= parseInt(min);
     });
 
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (sortOrder === "priceAsc") return (a.price || 0) - (b.price || 0);
+    if (sortOrder === "priceDesc") return (b.price || 0) - (a.price || 0);
+    return 0;
+  });
+
   const hasRealProducts =
     filteredProducts &&
     filteredProducts.length > 0 &&
@@ -47,22 +55,27 @@ const ProductList = () => {
       <ProductNavBar />
 
       <div className="max-w-8xl mx-auto px-6 pt-10 pb-16">
-        {/* Search and Filters */}
-        <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-center gap-8 mb-10">
-          <div className="flex-1 max-w-md">
-            <SearchBar
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-            />
+        {/* Search + Filters (Responsive) */}
+        <div className="w-full mb-6">
+          {/* Mobile toggle */}
+          <div className="flex items-center justify-between sm:hidden mb-3">
+            <div className="flex-1 mr-3">
+              <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+            </div>
+            <button
+              onClick={() => setPanelOpen((v) => !v)}
+              className="bg-gray-800 text-white px-3 py-2 rounded whitespace-nowrap"
+            >
+              {panelOpen ? "Hide Filters" : "Filters & Sort"}
+            </button>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
-            {/* Category Filter */}
-            <select
-              className="bg-gray-800 text-white px-3 py-2 rounded w-full sm:w-auto"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-            >
+          {/* Desktop inline controls */}
+          <div className="hidden sm:flex w-full flex-row items-center justify-center gap-4 mb-6">
+            <div className="flex-1 max-w-md">
+              <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+            </div>
+            <select className="bg-gray-800 text-white px-3 py-2 rounded" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
               <option value="">All Categories</option>
               <option value="Electronics">Electronics</option>
               <option value="Clothing">Clothing</option>
@@ -80,13 +93,7 @@ const ProductList = () => {
               <option value="Office Supplies">Office Supplies</option>
               <option value="Pet Supplies">Pet Supplies</option>
             </select>
-
-            {/* Price Filter */}
-            <select
-              className="bg-gray-800 text-white px-3 py-2 rounded w-full sm:w-auto"
-              value={selectedPriceRange}
-              onChange={(e) => setSelectedPriceRange(e.target.value)}
-            >
+            <select className="bg-gray-800 text-white px-3 py-2 rounded" value={selectedPriceRange} onChange={(e) => setSelectedPriceRange(e.target.value)}>
               <option value="all">All Prices</option>
               <option value="0-500">₹0 - ₹500</option>
               <option value="501-2000">₹501 - ₹2000</option>
@@ -94,7 +101,49 @@ const ProductList = () => {
               <option value="5001-10000">₹5001 - ₹10000</option>
               <option value="10000">₹10000+</option>
             </select>
+            <select className="bg-gray-800 text-white px-3 py-2 rounded" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
+              <option value="none">Sort: None</option>
+              <option value="priceAsc">Price: Low to High</option>
+              <option value="priceDesc">Price: High to Low</option>
+            </select>
           </div>
+
+          {/* Mobile expanded panel */}
+          {panelOpen && (
+            <div className="sm:hidden grid grid-cols-1 gap-3 bg-gray-800/40 p-3 rounded">
+              <select className="bg-gray-800 text-white px-3 py-2 rounded" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                <option value="">All Categories</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Books">Books</option>
+                <option value="Home & Kitchen">Home & Kitchen</option>
+                <option value="Beauty & Personal Care">Beauty & Personal Care</option>
+                <option value="Sports & Outdoors">Sports & Outdoors</option>
+                <option value="Toys & Games">Toys & Games</option>
+                <option value="Automotive">Automotive</option>
+                <option value="Grocery">Grocery</option>
+                <option value="Health">Health</option>
+                <option value="Jewelry">Jewelry</option>
+                <option value="Shoes">Shoes</option>
+                <option value="Watches">Watches</option>
+                <option value="Office Supplies">Office Supplies</option>
+                <option value="Pet Supplies">Pet Supplies</option>
+              </select>
+              <select className="bg-gray-800 text-white px-3 py-2 rounded" value={selectedPriceRange} onChange={(e) => setSelectedPriceRange(e.target.value)}>
+                <option value="all">All Prices</option>
+                <option value="0-500">₹0 - ₹500</option>
+                <option value="501-2000">₹501 - ₹2000</option>
+                <option value="2001-5000">₹2001 - ₹5000</option>
+                <option value="5001-10000">₹5001 - ₹10000</option>
+                <option value="10000">₹10000+</option>
+              </select>
+              <select className="bg-gray-800 text-white px-3 py-2 rounded" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
+                <option value="none">Sort: None</option>
+                <option value="priceAsc">Price: Low to High</option>
+                <option value="priceDesc">Price: High to Low</option>
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Product Cards */}
@@ -104,7 +153,7 @@ const ProductList = () => {
           ) : !hasRealProducts ? (
             <div className="text-center text-gray-400 text-lg">No matching products.</div>
           ) : (
-            filteredProducts.map((product, idx) => (
+            sortedProducts.map((product, idx) => (
               <ProductCard
                 key={product._id || idx}
                 product={product}

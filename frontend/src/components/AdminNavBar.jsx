@@ -19,7 +19,7 @@ const AdminNavBar = () => {
   return (
     <div className="w-full px-15 sm:px-7 py-4 bg-gray-900/70 backdrop-blur-md border-b border-white/10 shadow-sm sticky top-0 z-10">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 w-full px-8">
-        <h2 className="text-4xl archivo-black-regular bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent tracking-wide cursor-pointer">
+        <h2 onClick={() => navigate("/admin")} className="text-4xl archivo-black-regular bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent tracking-wide cursor-pointer">
           ADMIN DASHBOARD
         </h2>
         <div className="flex gap-3 items-center">

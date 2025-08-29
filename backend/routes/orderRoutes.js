@@ -9,7 +9,7 @@ const User = require("../models/User");
 // Create order
 router.post("/", authenticate, async (req, res) => {
   try {
-    const { products, totalAmount } = req.body;
+    const { products, totalAmount, fromCart } = req.body;
 
     if (!products || products.length === 0) {
       return res.status(400).json({ message: "No products provided" });
@@ -49,11 +49,14 @@ router.post("/", authenticate, async (req, res) => {
       totalAmount,
     });
 
-    // Clear the user's cart after successful order
-    await Cart.findOneAndUpdate(
-      { userId: req.user.id },
-      { $set: { products: [] } }
-    );
+    // If checkout is from cart, remove only the purchased items from the cart
+    if (fromCart) {
+      const purchasedIds = products.map(p => p.product);
+      await Cart.findOneAndUpdate(
+        { userId: req.user.id },
+        { $pull: { products: { product: { $in: purchasedIds } } } }
+      );
+    }
 
     res.status(201).json(order);
   } catch (error) {

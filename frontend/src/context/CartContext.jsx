@@ -18,13 +18,26 @@ function isAdmin() {
   }
 }
 
+// Helper to check if current user is buyer
+function isBuyer() {
+  try {
+    const token = sessionStorage.getItem("token");
+    if (!token) return false;
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.role === "buyer";
+  } catch {
+    return false;
+  }
+}
+
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
 
   const fetchCart = async () => {
-    if (isAdmin()) {
+    // Skip cart for non-buyers (e.g., seller/admin)
+    if (!isBuyer()) {
       setCart([]);
       setLoading(false);
       return;
@@ -55,7 +68,7 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
-    if (token && !isAdmin()) fetchCart();
+    if (token) fetchCart();
   }, []);
 
   // 🔄 Listen to login event and refetch cart

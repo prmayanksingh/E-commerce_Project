@@ -33,6 +33,7 @@ const OrderSummary = ({ cart, totalPrice, onClose }) => {
       await API.post("/orders", {
         products,
         totalAmount: calcTotalPrice(),
+        fromCart: true,
       });
 
       toast.success("Order placed successfully ✅");

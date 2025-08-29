@@ -1,19 +1,30 @@
 const express = require("express");
 const Cart = require("../models/Cart");
 const { authenticate } = require("../middleware/authMiddleware");
+const mongoose = require("mongoose");
 const router = express.Router();
 
 // Get current user's cart
 router.get("/", authenticate, async (req, res) => {
   try {
-    let cart = await Cart.findOne({ userId: req.user.id })
-      .populate({
+    let cart = await Cart.findOne({ userId: req.user.id });
+    if (cart && Array.isArray(cart.products)) {
+      const originalLength = cart.products.length;
+      cart.products = cart.products.filter(p => p && p.product && mongoose.Types.ObjectId.isValid(p.product));
+      if (cart.products.length !== originalLength) {
+        await cart.save();
+      }
+    }
+    if (cart) {
+      cart = await cart.populate({
         path: "products.product",
         populate: { path: "sellerId", select: "name" }
       });
+    }
     if (!cart) cart = await Cart.create({ userId: req.user.id, products: [] });
     res.json(cart);
   } catch (err) {
+    console.error("Error fetching cart:", err);
     res.status(500).json({ message: "Error fetching cart" });
   }
 });
